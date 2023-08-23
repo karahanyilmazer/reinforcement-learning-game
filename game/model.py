@@ -5,6 +5,52 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+class ResBlock(nn.Module):
+    def __init__(self, Fin, Fout, n_neurons=128):
+        super(ResBlock, self).__init__()
+        self.Fin = Fin
+        self.Fout = Fout
+
+        self.fc1 = nn.Linear(Fin, n_neurons)
+
+        self.fc2 = nn.Linear(n_neurons, Fout)
+
+        if Fin != Fout:
+            self.fc3 = nn.Linear(Fin, Fout)
+
+        self.ll = nn.LeakyReLU(negative_slope=0.2)
+
+    def forward(self, x, final_nl=True):
+        Xin = x if self.Fin == self.Fout else self.ll(self.fc3(x))
+
+        Xout = self.fc1(x)
+        Xout = self.ll(Xout)
+
+        Xout = self.fc2(Xout)
+        Xout = Xin + Xout
+
+        if final_nl:
+            return self.ll(Xout)
+        return Xout
+    
+class Res_QNet(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        self.linear1 = ResBlock(input_size, hidden_size)
+        self.linear2 = ResBlock(hidden_size, output_size)
+
+    def forward(self, x):
+        x = self.linear1(x)
+        x = self.linear2(x)
+        return x
+
+    def save(self, file_name='model.pth'):
+        model_folder_path = './model'
+        if not os.path.exists(model_folder_path):
+            os.makedirs(model_folder_path)
+
+        file_name = os.path.join(model_folder_path, file_name)
+        torch.save(self.state_dict(), file_name)
 
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
