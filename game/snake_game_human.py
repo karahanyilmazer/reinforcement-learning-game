@@ -1,3 +1,4 @@
+import os
 import random
 from collections import namedtuple
 from enum import Enum
@@ -5,7 +6,7 @@ from enum import Enum
 import pygame
 
 pygame.init()
-font = pygame.font.Font('arial.ttf', 25)
+font = pygame.font.Font(os.path.join('game', 'arial.ttf'), 25)
 # font = pygame.font.SysFont('arial', 25)
 
 
