@@ -14,12 +14,17 @@ LR = 0.001
 
 
 class Agent:
-    def __init__(self):
+    def __init__(self, is_explore = True, is_pretrained = True):
+        self.is_explore = is_explore
         self.n_games = 0
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)  # popleft()
         self.model = Linear_QNet(11, 256, 3)
+        self.is_pretrained = is_pretrained
+        if self.is_pretrained:
+            weights = torch.load('./model/model_nobound_85.pth')
+            self.model.load_state_dict(weights)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -87,14 +92,14 @@ class Agent:
         # random moves: tradeoff exploration / exploitation
         self.epsilon = 80 - self.n_games
         final_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
+        if (random.randint(0, 200) < self.epsilon) and self.is_explore:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            final_move[move] = 1
+            final_move[move] = 1 # type: ignore
 
         return final_move
 
@@ -104,8 +109,15 @@ def train():
     plot_mean_scores = []
     total_score = 0
     record = 0
-    agent = Agent()
-    game = SnakeGameAI()
+    agent = Agent(is_explore=False, is_pretrained=True)
+    game = SnakeGameAI(is_bounds = True)
+    select = input('Press Enter to start or type anything to select simulation mode \n')
+    if select != '':
+        explore = input('Exploration y/n \n')
+        agent.is_explore = True if explore == 'y' else False
+        bounds = input('Bounds y/n \n')
+        game.is_bounds = True if bounds == 'y' else False
+
     while True:
         # get old state
         state_old = agent.get_state(game)
