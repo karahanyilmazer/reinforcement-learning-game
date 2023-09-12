@@ -14,21 +14,22 @@ LR = 0.001
 
 
 class Agent:
-    def __init__(self):
+    def __init__(self, is_explore = True, is_pretrained = True):
+        self.is_explore = is_explore
         self.n_games = 0
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)  # popleft()
         self.model = Linear_QNet(11, 256, 3)
+        self.is_pretrained = is_pretrained
+        if self.is_pretrained:
+            weights = torch.load('./model/model_nobound_85.pth')
+            self.model.load_state_dict(weights)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game, snake_num):
-        if snake_num == 1:
-            head = game.snake1[0]
-            direction = game.direction1
-        elif snake_num == 2:
-            head = game.snake2[0]
-            direction = game.direction2
+        head = game.snake1[0] if snake_num == 1 else game.snake2[0]
+        direction = game.direction1 if snake_num == 1 else game.direction2
 
         point_l = Point(head.x - 20, head.y)
         point_r = Point(head.x + 20, head.y)
@@ -93,14 +94,14 @@ class Agent:
         # random moves: tradeoff exploration / exploitation
         self.epsilon = 80 - self.n_games
         final_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
+        if (random.randint(0, 200) < self.epsilon) and self.is_explore:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            final_move[move] = 1
+            final_move[move] = 1 # type: ignore
 
         return final_move
 
