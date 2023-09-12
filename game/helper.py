@@ -19,7 +19,6 @@ def plot(scores, mean_scores):
     plt.show(block=False)
     plt.pause(0.1)
 
-
 def plot_multi(scores1, mean_scores1, scores2, mean_scores2):
     display.clear_output(wait=True)
     display.display(plt.gcf())

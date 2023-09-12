@@ -28,13 +28,14 @@ BLUE2 = (0, 100, 255)
 BLACK = (0, 0, 0)
 
 BLOCK_SIZE = 20
-SPEED = 40
+SPEED = 100
 
 
 class SnakeGameAI:
-    def __init__(self, w=640, h=480):
+    def __init__(self, w=640, h=480, is_bounds = False):
         self.w = w
         self.h = h
+        self.is_bounds = is_bounds
         # init display
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake')
@@ -53,7 +54,7 @@ class SnakeGameAI:
         ]
 
         self.score = 0
-        self.food = None
+        self.food = Point(0, 0)
         self._place_food()
         self.frame_iteration = 0
 
@@ -102,13 +103,14 @@ class SnakeGameAI:
         if pt is None:
             pt = self.head
         # hits boundary
-        if (
-            pt.x > self.w - BLOCK_SIZE
-            or pt.x < 0
-            or pt.y > self.h - BLOCK_SIZE
-            or pt.y < 0
-        ):
-            return True
+        if self.is_bounds:
+            if (
+                pt.x > self.w - BLOCK_SIZE
+                or pt.x < 0
+                or pt.y > self.h - BLOCK_SIZE
+                or pt.y < 0
+            ):
+                return True
         # hits itself
         if pt in self.snake[1:]:
             return True
@@ -132,8 +134,8 @@ class SnakeGameAI:
             pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE),
         )
 
-        text = font.render("Score: " + str(self.score), True, WHITE)
-        self.display.blit(text, [0, 0])
+        # text = font.render("Score: " + str(self.score), True, WHITE)
+        # self.display.blit(text, [0, 0])
         pygame.display.flip()
 
     def _move(self, action):
@@ -155,13 +157,29 @@ class SnakeGameAI:
 
         x = self.head.x
         y = self.head.y
-        if self.direction == Direction.RIGHT:
-            x += BLOCK_SIZE
-        elif self.direction == Direction.LEFT:
-            x -= BLOCK_SIZE
-        elif self.direction == Direction.DOWN:
-            y += BLOCK_SIZE
-        elif self.direction == Direction.UP:
-            y -= BLOCK_SIZE
+
+        if self.is_bounds:
+            if self.direction == Direction.RIGHT:
+                x += BLOCK_SIZE
+            elif self.direction == Direction.LEFT:
+                x -= BLOCK_SIZE
+            elif self.direction == Direction.DOWN:
+                y += BLOCK_SIZE
+            elif self.direction == Direction.UP:
+                y -= BLOCK_SIZE
+        else:
+            if self.direction == Direction.RIGHT:
+                x = (x + BLOCK_SIZE) % self.w
+            elif self.direction == Direction.LEFT:
+                x = (x - BLOCK_SIZE) % self.w
+            elif self.direction == Direction.DOWN:
+                y = (y + BLOCK_SIZE) % self.h
+            elif self.direction == Direction.UP:
+                y = (y - BLOCK_SIZE) % self.h
 
         self.head = Point(x, y)
+
+        # self.head = Point(x, y)
+    def capture_frame(self):
+        frame = pygame.surfarray.array3d(self.display)
+        return np.rot90(np.flip(frame, 0),3)
