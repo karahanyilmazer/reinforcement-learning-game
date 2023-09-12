@@ -18,12 +18,3 @@ def plot(scores, mean_scores):
     plt.text(len(mean_scores) - 1, mean_scores[-1], str(mean_scores[-1]))
     plt.show(block=False)
     plt.pause(0.1)
-
-def plot_frame(img):
-    display.clear_output(wait=True)
-    display.display(plt.gcf())
-    plt.clf()
-    plt.title('Training...')
-    plt.imshow(img)
-    plt.show(block=False)
-    plt.pause(0.1)
