@@ -202,7 +202,7 @@ class SnakeGameAI:
         pygame.draw.rect(
             self.display,
             RED,
-            pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE),
+            pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE), # type: ignore
         )
 
         text = font.render(f"Score: {self.score1} - {self.score2}", True, WHITE)

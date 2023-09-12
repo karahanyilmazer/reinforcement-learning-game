@@ -100,8 +100,12 @@ class HybridQNet(nn.Module):
         self.q_net.eval()
 
         # self.linear_output = nn.Linear(output_size + 8192, output_size)
-        self.linear_output = nn.Linear(output_size + 576*4*4, output_size)
+        self.linear_output = nn.Linear(output_size + 576*4*4, hidden_size)
+        self.linear_output2 = nn.Linear(hidden_size, output_size)
+        self.linear_output2.weight = nn.Parameter(weights['linear2.weight'],True) # type: ignore
+        self.linear_output2.bias = nn.Parameter(weights['linear2.bias'],True) # type: ignore
         self.linear_output.train()
+        self.linear_output2.train()
         self.resize = transforms.Resize(100)
     
     def forward(self,img, x):
@@ -113,7 +117,8 @@ class HybridQNet(nn.Module):
         # cnn_out = torch.reshape(cnn_out, (-1,8192))
         qnet_out = self.q_net(x)
         hyqnet_in = torch.cat([cnn_out,qnet_out],1)
-        return self.linear_output(hyqnet_in)
+        lin_out = self.linear_output(hyqnet_in)
+        return self.linear_output2(lin_out)
     
     def save(self, file_name='hybrid_model.pth'):
         model_folder_path = './model'
@@ -227,5 +232,5 @@ if __name__ == '__main__':
     inference = model(img,x)
     # print(inference.shape)
     inference.sum().backward()
-    print(model.linear_output.bias.grad)
+    print(model.linear_output2.weight.grad)
     print(model.q_net.linear1.bias.grad)
