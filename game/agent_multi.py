@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from helper import plot_multi
 
-from game import Direction, Point, SnakeGameAI
+from game_multi import Direction, Point, SnakeGameAI
 from model import Linear_QNet, QTrainer
 
 MAX_MEMORY = 100_000
@@ -151,10 +151,10 @@ def train():
 
             if score1 > record1:
                 record1 = score1
-                agent1.model.save(title='snake_1')
+                agent1.model.save('snake_1.pth')
             if score2 > record2:
                 record2 = score2
-                agent2.model.save()
+                agent2.model.save('snake_2.pth')
 
             print(
                 'Game:',
