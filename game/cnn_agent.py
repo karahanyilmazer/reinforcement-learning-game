@@ -4,7 +4,7 @@ from collections import deque
 import numpy as np
 from sympy import print_rcode
 import torch
-from helper import plot, plot_frame
+from helper import plot
 from model import HybridQNet,HybridQTrainer, Linear_QNet, QTrainer
 
 from game import Direction, Point, SnakeGameAI
