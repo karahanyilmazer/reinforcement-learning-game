@@ -134,8 +134,8 @@ class SnakeGameAI:
             pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE),
         )
 
-        text = font.render("Score: " + str(self.score), True, WHITE)
-        self.display.blit(text, [0, 0])
+        # text = font.render("Score: " + str(self.score), True, WHITE)
+        # self.display.blit(text, [0, 0])
         pygame.display.flip()
 
     def _move(self, action):
@@ -180,3 +180,6 @@ class SnakeGameAI:
         self.head = Point(x, y)
 
         # self.head = Point(x, y)
+    def capture_frame(self):
+        frame = pygame.surfarray.array3d(self.display)
+        return np.rot90(np.flip(frame, 0),3)
