@@ -34,9 +34,10 @@ SPEED = 40
 
 
 class SnakeGameAI:
-    def __init__(self, w=640, h=480):
+    def __init__(self, w=640, h=480, is_bounds = False):
         self.w = w
         self.h = h
+        self.is_bounds = is_bounds
         # init display
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake')
@@ -156,13 +157,14 @@ class SnakeGameAI:
 
     def is_collision(self, pt, snake_num):
         # hits boundary
-        if (
-            pt.x > self.w - BLOCK_SIZE
-            or pt.x < 0
-            or pt.y > self.h - BLOCK_SIZE
-            or pt.y < 0
-        ):
-            return 1
+        if self.is_bounds:
+            if (
+                pt.x > self.w - BLOCK_SIZE
+                or pt.x < 0
+                or pt.y > self.h - BLOCK_SIZE
+                or pt.y < 0
+            ):
+                return 1
 
         # hits self or the body of the other snake
         if pt in self.snake1[1:] or pt in self.snake2[1:]:
@@ -200,7 +202,7 @@ class SnakeGameAI:
         pygame.draw.rect(
             self.display,
             RED,
-            pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE),
+            pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE), # type: ignore
         )
 
         text = font.render(f"Score: {self.score1} - {self.score2}", True, WHITE)
@@ -226,14 +228,25 @@ class SnakeGameAI:
 
         x = self.head1.x
         y = self.head1.y
-        if self.direction1 == Direction.RIGHT:
-            x += BLOCK_SIZE
-        elif self.direction1 == Direction.LEFT:
-            x -= BLOCK_SIZE
-        elif self.direction1 == Direction.DOWN:
-            y += BLOCK_SIZE
-        elif self.direction1 == Direction.UP:
-            y -= BLOCK_SIZE
+
+        if self.is_bounds:
+            if self.direction1 == Direction.RIGHT:
+                x += BLOCK_SIZE
+            elif self.direction1 == Direction.LEFT:
+                x -= BLOCK_SIZE
+            elif self.direction1 == Direction.DOWN:
+                y += BLOCK_SIZE
+            elif self.direction1 == Direction.UP:
+                y -= BLOCK_SIZE
+        else:
+            if self.direction1 == Direction.RIGHT:
+                x = (x + BLOCK_SIZE) % self.w
+            elif self.direction1 == Direction.LEFT:
+                x = (x - BLOCK_SIZE) % self.w
+            elif self.direction1 == Direction.DOWN:
+                y = (y + BLOCK_SIZE) % self.h
+            elif self.direction1 == Direction.UP:
+                y = (y - BLOCK_SIZE) % self.h
 
         self.head1 = Point(x, y)
 
@@ -256,13 +269,24 @@ class SnakeGameAI:
 
         x = self.head2.x
         y = self.head2.y
-        if self.direction2 == Direction.RIGHT:
-            x += BLOCK_SIZE
-        elif self.direction2 == Direction.LEFT:
-            x -= BLOCK_SIZE
-        elif self.direction2 == Direction.DOWN:
-            y += BLOCK_SIZE
-        elif self.direction2 == Direction.UP:
-            y -= BLOCK_SIZE
+        
+        if self.is_bounds:
+            if self.direction2 == Direction.RIGHT:
+                x += BLOCK_SIZE
+            elif self.direction2 == Direction.LEFT:
+                x -= BLOCK_SIZE
+            elif self.direction2 == Direction.DOWN:
+                y += BLOCK_SIZE
+            elif self.direction2 == Direction.UP:
+                y -= BLOCK_SIZE
+        else:
+            if self.direction2 == Direction.RIGHT:
+                x = (x + BLOCK_SIZE) % self.w
+            elif self.direction2 == Direction.LEFT:
+                x = (x - BLOCK_SIZE) % self.w
+            elif self.direction2 == Direction.DOWN:
+                y = (y + BLOCK_SIZE) % self.h
+            elif self.direction2 == Direction.UP:
+                y = (y - BLOCK_SIZE) % self.h
 
         self.head2 = Point(x, y)
