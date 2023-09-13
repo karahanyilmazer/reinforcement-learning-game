@@ -109,7 +109,9 @@ def train():
     plot_mean_scores = []
     total_score = 0
     record = 0
-    agent = Agent(is_explore=False, is_pretrained=True)
+    pretrained = input('Pretrained y/n \n')
+    is_pretrained = True if pretrained == 'y' else False
+    agent = Agent(is_explore=False, is_pretrained=is_pretrained)
     game = SnakeGameAI(is_bounds = True)
     select = input('Press Enter to start or type anything to select simulation mode \n')
     if select != '':
@@ -118,7 +120,7 @@ def train():
         bounds = input('Bounds y/n \n')
         game.is_bounds = True if bounds == 'y' else False
 
-    while True:
+    while agent.n_games < 200:
         # get old state
         state_old = agent.get_state(game)
 

@@ -14,7 +14,7 @@ LR = 0.001
 
 
 class Agent:
-    def __init__(self, is_explore = True, is_pretrained = True):
+    def __init__(self, is_explore = True, is_pretrained = True, model_path = './model/model_nobound_85.pth'):
         self.is_explore = is_explore
         self.n_games = 0
         self.epsilon = 0  # randomness
@@ -23,7 +23,7 @@ class Agent:
         self.model = Linear_QNet(11, 256, 3)
         self.is_pretrained = is_pretrained
         if self.is_pretrained:
-            weights = torch.load('./model/model_nobound_85.pth')
+            weights = torch.load(model_path)
             self.model.load_state_dict(weights)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
@@ -115,10 +115,10 @@ def train():
     total_score2 = 0
     record1 = 0
     record2 = 0
-    agent1 = Agent()
-    agent2 = Agent()
+    agent1 = Agent(is_explore = False, model_path='./model/model_nobound_85.pth')
+    agent2 = Agent(is_explore = False, model_path='./model/model_bound_73.pth')
     game = SnakeGameAI()
-    while True:
+    while agent1.n_games < 200 or agent2.n_games < 200:
         # get old state
         state_old1 = agent1.get_state(game, snake_num=1)
         state_old2 = agent2.get_state(game, snake_num=2)
