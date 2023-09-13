@@ -3,9 +3,9 @@ from collections import deque
 
 import numpy as np
 import torch
+from game_multi import Direction, Point, SnakeGameAI
 from helper import plot_multi
 
-from game_multi import Direction, Point, SnakeGameAI
 from model import Linear_QNet, QTrainer
 
 MAX_MEMORY = 100_000
@@ -14,7 +14,12 @@ LR = 0.001
 
 
 class Agent:
-    def __init__(self, is_explore = True, is_pretrained = True, model_path = './model/model_nobound_85.pth'):
+    def __init__(
+        self,
+        is_explore=True,
+        is_pretrained=True,
+        model_path='./model/model_nobound_85.pth',
+    ):
         self.is_explore = is_explore
         self.n_games = 0
         self.epsilon = 0  # randomness
@@ -101,7 +106,7 @@ class Agent:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            final_move[move] = 1 # type: ignore
+            final_move[move] = 1  # type: ignore
 
         return final_move
 
@@ -115,8 +120,8 @@ def train():
     total_score2 = 0
     record1 = 0
     record2 = 0
-    agent1 = Agent(is_explore = False, model_path='./model/model_nobound_85.pth')
-    agent2 = Agent(is_explore = False, model_path='./model/model_bound_73.pth')
+    agent1 = Agent(is_explore=False, model_path='./model/model_nobound_85.pth')
+    agent2 = Agent(is_explore=False, model_path='./model/model_bound_73.pth')
     game = SnakeGameAI()
     while agent1.n_games < 200 or agent2.n_games < 200:
         # get old state

@@ -34,7 +34,7 @@ SPEED = 40
 
 
 class SnakeGameAI:
-    def __init__(self, w=640, h=480, is_bounds = False):
+    def __init__(self, w=640, h=480, is_bounds=False):
         self.w = w
         self.h = h
         self.is_bounds = is_bounds
@@ -202,7 +202,7 @@ class SnakeGameAI:
         pygame.draw.rect(
             self.display,
             RED,
-            pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE), # type: ignore
+            pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE),  # type: ignore
         )
 
         text = font.render(f"Score: {self.score1} - {self.score2}", True, WHITE)
@@ -269,7 +269,7 @@ class SnakeGameAI:
 
         x = self.head2.x
         y = self.head2.y
-        
+
         if self.is_bounds:
             if self.direction2 == Direction.RIGHT:
                 x += BLOCK_SIZE

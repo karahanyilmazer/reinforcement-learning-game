@@ -2,12 +2,12 @@ import random
 from collections import deque
 
 import numpy as np
-from sympy import print_rcode
 import torch
 from helper import plot
-from model import HybridQNet,HybridQTrainer, Linear_QNet, QTrainer
+from sympy import print_rcode
 
 from game import Direction, Point, SnakeGameAI
+from model import HybridQNet, HybridQTrainer, Linear_QNet, QTrainer
 
 MAX_MEMORY = 1000
 BATCH_SIZE = 1000
@@ -15,13 +15,17 @@ LR = 0.001
 
 
 class Agent:
-    def __init__(self, is_explore = True, is_pretrained = True):
+    def __init__(self, is_explore=True, is_pretrained=True):
         self.is_explore = is_explore
         self.n_games = 0
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)  # popleft()
-        self.device = torch.device('cuda:{}'.format(0)) if torch.cuda.is_available() else torch.device('cpu')
+        self.device = (
+            torch.device('cuda:{}'.format(0))
+            if torch.cuda.is_available()
+            else torch.device('cpu')
+        )
         self.model = HybridQNet(11, 256, 3).to(self.device)
         # self.is_pretrained = is_pretrained
         # if self.is_pretrained:
@@ -82,13 +86,21 @@ class Agent:
         else:
             mini_sample = self.memory
 
-        frames, states, actions, rewards, next_frames, next_states, dones = zip(*mini_sample)
-        self.trainer.train_step( frames, states, actions, rewards, next_frames, next_states, dones)
+        frames, states, actions, rewards, next_frames, next_states, dones = zip(
+            *mini_sample
+        )
+        self.trainer.train_step(
+            frames, states, actions, rewards, next_frames, next_states, dones
+        )
         # for state, action, reward, nexrt_state, done in mini_sample:
         #    self.trainer.train_step(state, action, reward, next_state, done)
 
-    def train_short_memory(self, frame, state, action, reward, next_frame, next_state, done):
-        self.trainer.train_step(frame, state, action, reward, next_frame, next_state, done)
+    def train_short_memory(
+        self, frame, state, action, reward, next_frame, next_state, done
+    ):
+        self.trainer.train_step(
+            frame, state, action, reward, next_frame, next_state, done
+        )
 
     def get_action(self, state, frame):
         # random moves: tradeoff exploration / exploitation
@@ -103,13 +115,15 @@ class Agent:
 
             prediction = self.model(frame0, state0)
             move = torch.argmax(prediction).item()
-            final_move[move] = 1 # type: ignore
+            final_move[move] = 1  # type: ignore
 
         return final_move
+
 
 def add_dim(array):
     array = array[None, ...]
     return array
+
 
 def train():
     plot_scores = []
@@ -117,7 +131,7 @@ def train():
     total_score = 0
     record = 0
     agent = Agent(is_explore=True, is_pretrained=True)
-    game = SnakeGameAI(w=160, h=160, is_bounds = False)
+    game = SnakeGameAI(w=160, h=160, is_bounds=False)
     select = input('Press Enter to start or type anything to select simulation mode \n')
     if select != '':
         explore = input('Exploration y/n \n')
@@ -137,10 +151,20 @@ def train():
         state_new = agent.get_state(game)
         frame_new = game.capture_frame().T
         # train short memory
-        agent.train_short_memory(add_dim(frame_old), add_dim(state_old), final_move, reward, add_dim(frame_new), add_dim(state_new), done)
+        agent.train_short_memory(
+            add_dim(frame_old),
+            add_dim(state_old),
+            final_move,
+            reward,
+            add_dim(frame_new),
+            add_dim(state_new),
+            done,
+        )
 
         # remember
-        agent.remember(frame_old, state_old, final_move, reward, frame_new, state_new, done)
+        agent.remember(
+            frame_old, state_old, final_move, reward, frame_new, state_new, done
+        )
 
         if done:
             # train long memory, plot result

@@ -34,7 +34,7 @@ SPEED = 100
 
 
 class SnakeGameAI:
-    def __init__(self, w=640, h=480, is_bounds = False):
+    def __init__(self, w=640, h=480, is_bounds=False):
         self.w = w
         self.h = h
         self.is_bounds = is_bounds
@@ -182,6 +182,7 @@ class SnakeGameAI:
         self.head = Point(x, y)
 
         # self.head = Point(x, y)
+
     def capture_frame(self):
         frame = pygame.surfarray.array3d(self.display)
-        return np.rot90(np.flip(frame, 0),3)
+        return np.rot90(np.flip(frame, 0), 3)

@@ -4,9 +4,9 @@ from collections import deque
 import numpy as np
 import torch
 from helper import plot
-from model import Linear_QNet, QTrainer
 
 from game import Direction, Point, SnakeGameAI
+from model import Linear_QNet, QTrainer
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -14,7 +14,7 @@ LR = 0.001
 
 
 class Agent:
-    def __init__(self, is_explore = True, is_pretrained = True):
+    def __init__(self, is_explore=True, is_pretrained=True):
         self.is_explore = is_explore
         self.n_games = 0
         self.epsilon = 0  # randomness
@@ -99,7 +99,7 @@ class Agent:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            final_move[move] = 1 # type: ignore
+            final_move[move] = 1  # type: ignore
 
         return final_move
 
@@ -112,7 +112,7 @@ def train():
     pretrained = input('Pretrained y/n \n')
     is_pretrained = True if pretrained == 'y' else False
     agent = Agent(is_explore=False, is_pretrained=is_pretrained)
-    game = SnakeGameAI(is_bounds = True)
+    game = SnakeGameAI(is_bounds=True)
     select = input('Press Enter to start or type anything to select simulation mode \n')
     if select != '':
         explore = input('Exploration y/n \n')
